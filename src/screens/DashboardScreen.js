@@ -1,8 +1,8 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity, Modal, TextInput, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons'; // NEW: We need this for the trash icon!
+import { Ionicons } from '@expo/vector-icons'; 
 import { workoutPlan } from '../data/workoutPlan';
 
 export default function DashboardScreen({ navigation }) {
@@ -96,35 +96,58 @@ export default function DashboardScreen({ navigation }) {
         </View>
       </View>
       
+      {/* Upgraded Custom Premium Buttons */}
       <View style={styles.buttonContainer}>
         {currentPlan.type === 'full_body' ? (
           <View style={styles.splitBtnWrapper}>
-            <Button title="START FULL BODY WORKOUT" color="#4630EB" onPress={() => navigation.navigate('Workout', { monthId: selectedMonth })} />
+            <TouchableOpacity 
+              style={[styles.customButton, { backgroundColor: '#4630EB' }]} 
+              onPress={() => navigation.navigate('Workout', { monthId: selectedMonth })}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.customButtonText}>START FULL BODY WORKOUT</Text>
+            </TouchableOpacity>
           </View>
         ) : (
           <View style={styles.splitButtons}>
-            {Object.keys(currentPlan.routines).map((routineKey) => (
-              <View key={routineKey} style={styles.splitBtnWrapper}>
-                <Button 
-                  title={`START ${currentPlan.routines[routineKey].name.toUpperCase()}`} 
-                  color={routineKey === 'push' ? '#e53935' : routineKey === 'pull' ? '#1e88e5' : '#43a047'}
-                  onPress={() => navigation.navigate('Workout', { monthId: selectedMonth, routineType: routineKey })} 
-                />
-              </View>
-            ))}
+            {Object.keys(currentPlan.routines).map((routineKey) => {
+              // Dynamic coloring based on the routine type
+              const btnColor = routineKey === 'push' || routineKey === 'upper' ? '#e53935' : 
+                               routineKey === 'pull' || routineKey === 'lower' ? '#1e88e5' : '#43a047';
+              
+              return (
+                <View key={routineKey} style={styles.splitBtnWrapper}>
+                  <TouchableOpacity 
+                    style={[styles.customButton, { backgroundColor: btnColor }]} 
+                    onPress={() => navigation.navigate('Workout', { monthId: selectedMonth, routineType: routineKey })}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={styles.customButtonText}>{`START ${currentPlan.routines[routineKey].name.toUpperCase()}`}</Text>
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
           </View>
         )}
         
         <View style={styles.historyWrapper}>
-          <Button title="VIEW CALENDAR HISTORY" color="#555" onPress={() => navigation.navigate('History', { monthId: selectedMonth })} />
+          <TouchableOpacity 
+            style={[styles.customButton, styles.historyButton]} 
+            onPress={() => navigation.navigate('History', { monthId: selectedMonth })}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="calendar-outline" size={20} color="#333" style={{ marginRight: 8 }} />
+            <Text style={styles.historyButtonText}>VIEW CALENDAR HISTORY</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
-      {/* NEW: Circular Floating Action Button on the Bottom Left */}
+      {/* Floating Action Button */}
       <TouchableOpacity style={styles.floatingResetButton} onPress={() => setResetModalVisible(true)}>
-        <Ionicons  size={5} color="#fff" />
+        <Ionicons  size={24} color="#fff" />
       </TouchableOpacity>
 
+      {/* Reset Modal */}
       <Modal animationType="fade" transparent={true} visible={resetModalVisible} onRequestClose={() => setResetModalVisible(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
@@ -139,11 +162,16 @@ export default function DashboardScreen({ navigation }) {
               placeholder="Type reset here..."
               placeholderTextColor="#999"
               autoCapitalize="none"
+              autoFocus={true} 
             />
             
             <View style={styles.modalButtons}>
-              <Button title="CANCEL" color="#555" onPress={() => { setResetModalVisible(false); setResetInput(''); }} />
-              <Button title="WIPE DATA" color="red" onPress={executeReset} />
+              <TouchableOpacity style={[styles.customButton, { backgroundColor: '#555', flex: 1, marginRight: 10 }]} onPress={() => { setResetModalVisible(false); setResetInput(''); }}>
+                <Text style={styles.customButtonText}>CANCEL</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.customButton, { backgroundColor: 'red', flex: 1, marginLeft: 10 }]} onPress={executeReset}>
+                <Text style={styles.customButtonText}>WIPE DATA</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -166,34 +194,69 @@ const styles = StyleSheet.create({
   progressText: { fontSize: 16, marginBottom: 10, textAlign: 'center', fontWeight: '600' },
   progressBarBackground: { height: 20, backgroundColor: '#e0e0e0', borderRadius: 10, overflow: 'hidden' },
   progressBarFill: { height: '100%', backgroundColor: '#4caf50' },
+  
   buttonContainer: { width: '100%' },
   splitButtons: { width: '100%' },
   splitBtnWrapper: { marginBottom: 15, width: '100%' },
   historyWrapper: { marginTop: 15, width: '100%' },
   
-  /* NEW: Floating Reset Button Styles */
+  /* Premium Custom Button Styles */
+  customButton: {
+    width: '100%',
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    elevation: 4, 
+    shadowColor: '#000', 
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+  },
+  customButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    letterSpacing: 1,
+  },
+  historyButton: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+  },
+  historyButtonText: {
+    color: '#333',
+    fontSize: 15,
+    fontWeight: 'bold',
+  },
+
+  /* Floating Reset Button Styles */
   floatingResetButton: {
     position: 'absolute',
-    bottom: 30,  // Distance from bottom
-    left: 20,    // Distance from left
-    width: 18,
-    height: 18,
-    borderRadius: 25, // Making it a perfect circle
-    backgroundColor: '#c62828', // A nice dark/muted red color
+    bottom: 30,
+    left: 20,
+    width: 20,
+    height: 20,
+    borderRadius: 25,
+    backgroundColor: '#c62828',
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 5, // Android shadow
-    shadowColor: '#000', // iOS shadow
+    elevation: 5,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
   },
   
+  /* Modal Styles */
   modalOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.7)' },
   modalContent: { width: '85%', backgroundColor: '#fff', borderRadius: 15, padding: 20, alignItems: 'center', elevation: 10 },
   modalTitle: { fontSize: 20, fontWeight: 'bold', color: 'red', marginBottom: 10 },
   modalText: { fontSize: 14, color: '#333', textAlign: 'center', marginBottom: 15 },
   modalInstructions: { fontSize: 14, color: '#555', marginBottom: 10 },
-  input: { width: '100%', borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 10, fontSize: 16, textAlign: 'center', marginBottom: 20 },
-  modalButtons: { flexDirection: 'row', justifyContent: 'space-around', width: '100%' }
+  input: { width: '100%', borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 10, fontSize: 16, marginBottom: 20 },
+  modalButtons: { flexDirection: 'row', justifyContent: 'space-between', width: '100%' }
 });

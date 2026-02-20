@@ -2,7 +2,7 @@ export const workoutPlan = {
   month1: {
     id: "m1",
     title: "Building Foundation",
-    weeks: "Week 1-4",
+    weeks: "Week 1-4 (full body workout)",
     daysInBlock: 28,
     minimumTargetSessions: 12,
     type: "full_body",
@@ -22,8 +22,8 @@ export const workoutPlan = {
   
   month2: {
     id: "m2",
-    title: "Increasing Intensity & Skill",
-    weeks: "Week 5-8",
+    title: "Increasing Intensity & Skill Introduction",
+    weeks: "Week 5-8 (Split)",
     daysInBlock: 28,
     minimumTargetSessions: 16,
     type: "split",
@@ -56,47 +56,49 @@ export const workoutPlan = {
     }
   },
 
-  // NEW: Month 3 Push/Pull/Legs Split
+  // NEW: Month 3 based on your handwritten notes!
   month3: {
     id: "m3",
-    title: "Mastery & Hypertrophy",
+    title: "Skill Focus & Advanced",
     weeks: "Week 9-12",
     daysInBlock: 28,
-    minimumTargetSessions: 20, // 5 days a week target
+    minimumTargetSessions: 18, // 4 to 5 times a week
     type: "split",
     routines: {
-      push: {
-        name: "Advanced Push",
-        warmup: { duration: "10 Min", notes: "Wrist & Shoulder Mobility" },
+      upper: {
+        name: "Upper Body",
+        warmup: { duration: "5-10 Min", notes: "Wrist mobility & light cardio" },
         exercises: [
-          { id: "m3p1", name: "Wall Handstand Pushups", sets: 4, reps: "6-8", videoId: "hwkiJntX8Zg" },
-          { id: "m3p2", name: "Advanced Dips", sets: 4, reps: "12-15", videoId: "2z8JmcrW-As" },
-          { id: "m3p3", name: "Pseudo Planche Pushups", sets: 3, reps: "10", videoId: "7xXW8J6C3e0" },
-          { id: "m3p4", name: "Triceps Extensions (Bodyweight)", sets: 3, reps: "12", videoId: "gTQXB2D3H1o" }
+          { id: "m3u1", name: "Decline Push-ups", sets: 4, reps: "15", videoId: "ZtMdEOnUeaQ" },
+          { id: "m3u2", name: "Pull-ups", sets: 4, reps: "12", videoId: "eGo4IYtlpEM" },
+          { id: "m3u3", name: "Dips", sets: 4, reps: "15", videoId: "2z8JmcrW-As" },
+          { id: "m3u4", name: "Archer Push-ups", sets: 3, reps: "10/side", videoId: "KtwXhQmnMQA" },
+          { id: "m3u5", name: "Plank to Push-ups", sets: 3, reps: "20", videoId: "gTQXB2D3H1o" }
         ],
-        cooldown: { duration: "10 Min" }
+        cooldown: { duration: "5 Min" }
       },
-      pull: {
-        name: "Advanced Pull",
-        warmup: { duration: "10 Min", notes: "Scapula pull-ups & hangs" },
+      lower: {
+        name: "Lower Body & Core",
+        warmup: { duration: "10 Min", notes: "Dynamic stretches" },
         exercises: [
-          { id: "m3pl1", name: "Archer Pull-ups", sets: 4, reps: "6/side", videoId: "X_lE4r-JbZc" },
-          { id: "m3pl2", name: "Muscle-up Negatives", sets: 4, reps: "5", videoId: "X-QxU-HnmbI" },
-          { id: "m3pl3", name: "Front Lever Tucks", sets: 3, reps: "15 sec hold", videoId: "vA_IqZ7F0_c" },
-          { id: "m3pl4", name: "Chin-ups", sets: 3, reps: "Max", videoId: "eGo4IYtlpEM" }
+          { id: "m3l1", name: "Pistol Squats (Assisted)", sets: 4, reps: "10/leg", videoId: "vq5-cdjihcg" },
+          { id: "m3l2", name: "Bulgarian Split Squats", sets: 4, reps: "15/leg", videoId: "2C-uNgKwPLE" },
+          { id: "m3l3", name: "Single-Leg Glute Bridges", sets: 3, reps: "20/leg", videoId: "_uEos2b1wE0" },
+          { id: "m3l4", name: "Calf Raises", sets: 3, reps: "30", videoId: "-M4-G8p8fmc" },
+          { id: "m3l5", name: "Hanging Leg Raises", sets: 3, reps: "15", videoId: "Pr1ieGZ5atk" },
+          { id: "m3l6", name: "Windshield Wipers", sets: 3, reps: "15/side", videoId: "0Z6qJg35cEE" }
         ],
-        cooldown: { duration: "10 Min" }
+        cooldown: { duration: "5 Min" }
       },
-      legs: {
-        name: "Legs & Core",
-        warmup: { duration: "10 Min", notes: "Dynamic stretches & deep squats" },
+      skills: {
+        name: "Skill Training",
+        warmup: { duration: "5 Min", notes: "Wrist & Shoulder prep" },
         exercises: [
-          { id: "m3l1", name: "Pistol Squats", sets: 4, reps: "8/leg", videoId: "vq5-cdjihcg" },
-          { id: "m3l2", name: "Shrimp Squats", sets: 3, reps: "8/leg", videoId: "gcNh17Ckjgg" },
-          { id: "m3l3", name: "Dragon Flags", sets: 4, reps: "8", videoId: "wkD8rjkodUI" },
-          { id: "m3l4", name: "L-Sit Hold", sets: 4, reps: "15 sec", videoId: "Pr1ieGZ5atk" }
+          { id: "m3s1", name: "Wall-assisted Handstand", sets: 3, reps: "30 sec hold", videoId: "hwkiJntX8Zg" },
+          { id: "m3s2", name: "L-sit Progression (Tuck Sits)", sets: 3, reps: "15-20 sec hold", videoId: "IUZJoSP66HI" },
+          { id: "m3s3", name: "Muscle-up Progressions (Jumping/Band)", sets: 3, reps: "5", videoId: "X-QxU-HnmbI" }
         ],
-        cooldown: { duration: "10 Min" }
+        cooldown: { duration: "5 Min" }
       }
     }
   }

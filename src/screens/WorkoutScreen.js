@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Button, StyleSheet, FlatList, Alert, Modal, TouchableOpacity } from 'react-native';
 import Checkbox from 'expo-checkbox';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Ionicons } from '@expo/vector-icons'; // Built-in icons!
+import { Ionicons } from '@expo/vector-icons'; 
 import YoutubePlayer from 'react-native-youtube-iframe';
 import { workoutPlan } from '../data/workoutPlan';
 
@@ -11,38 +11,32 @@ export default function WorkoutScreen({ navigation }) {
   const warmup = workoutPlan.month1.routine.warmup;
 
   const [checkedItems, setCheckedItems] = useState({});
-  // NEW: States for our video pop-up
   const [modalVisible, setModalVisible] = useState(false);
   const [currentVideoId, setCurrentVideoId] = useState(null);
 
   const toggleCheckbox = (id) => {
-    setCheckedItems(prev => ({
-      ...prev,
-      [id]: !prev[id]
-    }));
+    setCheckedItems(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  // NEW: Function to save the workout completion date
+  const openVideo = (videoId) => {
+    setCurrentVideoId(videoId);
+    setModalVisible(true);
+  };
+
   const finishWorkout = async () => {
     try {
-      // Get today's date in YYYY-MM-DD format
       const today = new Date().toISOString().split('T')[0];
-      
-      // Fetch any previously saved dates
       const existingData = await AsyncStorage.getItem('completedDates');
       let datesArray = existingData ? JSON.parse(existingData) : [];
 
-      // If today isn't already saved, add it to the array
       if (!datesArray.includes(today)) {
         datesArray.push(today);
         await AsyncStorage.setItem('completedDates', JSON.stringify(datesArray));
       }
 
-      // Show a quick success alert, then navigate back
       Alert.alert("Awesome!", "Workout saved successfully.", [
         { text: "OK", onPress: () => navigation.navigate('Dashboard') }
       ]);
-
     } catch (error) {
       console.error("Error saving workout:", error);
       Alert.alert("Error", "Could not save workout data.");
@@ -50,7 +44,13 @@ export default function WorkoutScreen({ navigation }) {
   };
 
   const renderExercise = ({ item }) => (
-    <View style={styles.exerciseRow}>
+    // FIX 1: We changed this main View into a TouchableOpacity
+    // Now tapping anywhere on the row triggers toggleCheckbox
+    <TouchableOpacity 
+      style={styles.exerciseRow} 
+      onPress={() => toggleCheckbox(item.id)}
+      activeOpacity={0.7}
+    >
       <Checkbox
         style={styles.checkbox}
         value={checkedItems[item.id] || false}
@@ -61,13 +61,13 @@ export default function WorkoutScreen({ navigation }) {
         <Text style={styles.exerciseName}>{item.name}</Text>
         <Text style={styles.exerciseDetails}>{item.sets} sets x {item.reps}</Text>
       </View>
-      {/* NEW: Play Button for the video */}
+      
       {item.videoId && (
         <TouchableOpacity onPress={() => openVideo(item.videoId)} style={styles.playButton}>
-          <Ionicons name="play-circle" size={32} color="#ff0000" />
+          <Ionicons name="play-circle" size={36} color="#ff0000" />
         </TouchableOpacity>
       )}
-    </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -83,34 +83,40 @@ export default function WorkoutScreen({ navigation }) {
       />
 
       <View style={styles.buttonContainer}>
-        {/* NEW: Updated the onPress to trigger our save function */}
-        <Button 
-          title="COMPLETE WORKOUT" 
-          color="green"
-          onPress={finishWorkout} 
-        />
+        <Button title="COMPLETE WORKOUT" color="green" onPress={finishWorkout} />
       </View>
 
-      {/* NEW: The Video Pop-up Modal */}
       <Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
+        {/* FIX 2: Redesigned the modal to be a sleek Bottom Sheet */}
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+          <View style={styles.bottomSheet}>
+            
+            <View style={styles.sheetHeader}>
+              <Text style={styles.sheetTitle}>Tutorial</Text>
+              <TouchableOpacity onPress={() => setModalVisible(false)}>
+                <Ionicons name="close-circle" size={30} color="#d3d3d3" />
+              </TouchableOpacity>
+            </View>
+
             {currentVideoId && (
-              <YoutubePlayer
-                height={220}
-                play={true}
-                videoId={currentVideoId}
-              />
+              <View style={styles.videoContainer}>
+                <YoutubePlayer
+                  height={220}
+                  play={true}
+                  videoId={currentVideoId}
+                />
+              </View>
             )}
-            <Button title="Close Video" color="#333" onPress={() => setModalVisible(false)} />
+
           </View>
         </View>
       </Modal>
+
     </View>
   );
 }
@@ -120,13 +126,45 @@ const styles = StyleSheet.create({
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 10 },
   warmup: { fontSize: 14, color: '#666', marginBottom: 20, fontStyle: 'italic' },
   list: { flex: 1 },
-  exerciseRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 15, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#eee' },
+  exerciseRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 15, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#eee' },
   checkbox: { marginRight: 15, width: 24, height: 24 },
   exerciseInfo: { flex: 1 },
   exerciseName: { fontSize: 18, fontWeight: '500' },
   exerciseDetails: { fontSize: 14, color: '#555', marginTop: 4 },
+  playButton: { padding: 5 },
   buttonContainer: { marginTop: 20, paddingBottom: 20 },
-  /* Modal Styles */
-  modalOverlay: { flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.8)' },
-  modalContent: { backgroundColor: '#fff', margin: 20, borderRadius: 10, overflow: 'hidden', paddingBottom: 10 }
+  
+  /* NEW: Bottom Sheet Modal Styles */
+  modalOverlay: { 
+    flex: 1, 
+    justifyContent: 'flex-end', /* Pushes the box to the very bottom */
+    backgroundColor: 'rgba(0,0,0,0.6)' /* Darkens the background behind it */
+  },
+  bottomSheet: { 
+    backgroundColor: '#fff', 
+    borderTopLeftRadius: 25, 
+    borderTopRightRadius: 25, 
+    padding: 20, 
+    paddingBottom: 40,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 5
+  },
+  sheetHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 15
+  },
+  sheetTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333'
+  },
+  videoContainer: {
+    borderRadius: 10,
+    overflow: 'hidden'
+  }
 });

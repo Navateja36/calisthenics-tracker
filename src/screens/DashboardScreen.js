@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 
-export default function DashboardScreen({ navigation }) {
+export default function DashboardScreen({ navigation }) { //navigation -props
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Month 1: Building Foundation</Text>

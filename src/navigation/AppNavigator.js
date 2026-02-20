@@ -13,7 +13,7 @@ export default function AppNavigator() {
       <Stack.Navigator initialRouteName="Dashboard">
         <Stack.Screen 
           name="Dashboard" 
-          component={DashboardScreen} 
+          component={DashboardScreen}   
           options={{ title: 'My Calisthenics' }} 
         />
         <Stack.Screen 

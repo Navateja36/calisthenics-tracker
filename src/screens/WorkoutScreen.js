@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, Button, StyleSheet, FlatList } from 'react-native';
+import { View, Text, Button, StyleSheet, FlatList, Alert } from 'react-native';
 import Checkbox from 'expo-checkbox';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { workoutPlan } from '../data/workoutPlan';
 
 export default function WorkoutScreen({ navigation }) {
-  // Pulling Month 1 data directly from our JSON file
   const exercises = workoutPlan.month1.routine.exercises;
   const warmup = workoutPlan.month1.routine.warmup;
 
-  // State to keep track of which boxes are checked
   const [checkedItems, setCheckedItems] = useState({});
 
   const toggleCheckbox = (id) => {
@@ -18,7 +17,33 @@ export default function WorkoutScreen({ navigation }) {
     }));
   };
 
-  // How a single exercise row should look
+  // NEW: Function to save the workout completion date
+  const finishWorkout = async () => {
+    try {
+      // Get today's date in YYYY-MM-DD format
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Fetch any previously saved dates
+      const existingData = await AsyncStorage.getItem('completedDates');
+      let datesArray = existingData ? JSON.parse(existingData) : [];
+
+      // If today isn't already saved, add it to the array
+      if (!datesArray.includes(today)) {
+        datesArray.push(today);
+        await AsyncStorage.setItem('completedDates', JSON.stringify(datesArray));
+      }
+
+      // Show a quick success alert, then navigate back
+      Alert.alert("Awesome!", "Workout saved successfully.", [
+        { text: "OK", onPress: () => navigation.navigate('Dashboard') }
+      ]);
+
+    } catch (error) {
+      console.error("Error saving workout:", error);
+      Alert.alert("Error", "Could not save workout data.");
+    }
+  };
+
   const renderExercise = ({ item }) => (
     <View style={styles.exerciseRow}>
       <Checkbox
@@ -31,7 +56,6 @@ export default function WorkoutScreen({ navigation }) {
         <Text style={styles.exerciseName}>{item.name}</Text>
         <Text style={styles.exerciseDetails}>{item.sets} sets x {item.reps}</Text>
       </View>
-      {/* We will add the video link button here later */}
     </View>
   );
 
@@ -48,10 +72,11 @@ export default function WorkoutScreen({ navigation }) {
       />
 
       <View style={styles.buttonContainer}>
+        {/* NEW: Updated the onPress to trigger our save function */}
         <Button 
           title="COMPLETE WORKOUT" 
           color="green"
-          onPress={() => navigation.navigate('Dashboard')} 
+          onPress={finishWorkout} 
         />
       </View>
     </View>

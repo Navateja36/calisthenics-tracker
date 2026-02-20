@@ -57,6 +57,13 @@ export default function DashboardScreen({ navigation }) {
           color="#4630EB"
           onPress={() => navigation.navigate('Workout')} 
         />
+        <View style={{ marginTop: 15 }}>
+        <Button 
+            title="VIEW CALENDAR HISTORY" 
+            color="#555"
+            onPress={() => navigation.navigate('History')} 
+          />
+        </View>
       </View>
     </View>
   );

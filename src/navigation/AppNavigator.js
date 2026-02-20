@@ -15,7 +15,7 @@ export default function AppNavigator() {
         <Stack.Screen 
           name="Dashboard" 
           component={DashboardScreen}   
-          options={{ title: 'My Calisthenics' }} 
+          options={{ title: 'CaliTrack' }}
         />
         <Stack.Screen 
           name="Workout" 

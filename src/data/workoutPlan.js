@@ -10,12 +10,12 @@ export const workoutPlan = {
       routine: {
         warmup: { name: "Warmup", duration: "5-10 Min", notes: "Light cardio / Jumping jacks", videoUrl: "" },
         exercises: [
-          { id: "e1", name: "Pushups", sets: 3, reps: "12", videoUrl: "" },
-          { id: "e2", name: "Pull-ups", sets: 3, reps: "8", videoUrl: "" },
-          { id: "e3", name: "Dips", sets: 3, reps: "12", videoUrl: "" },
-          { id: "e4", name: "Squats", sets: 3, reps: "20", videoUrl: "" },
-          { id: "e5", name: "Lunges", sets: 3, reps: "15/leg", videoUrl: "" },
-          { id: "e6", name: "Plank", sets: 3, reps: "60 sec", videoUrl: "" }
+          { id: "e1", name: "Pushups", sets: 3, reps: "12", videoId: "IODxDxX7oi4" },
+          { id: "e2", name: "Pull-ups", sets: 3, reps: "8", videoId: "eGo4IYtlpEM" },
+          { id: "e3", name: "Dips", sets: 3, reps: "12", videoId: "2z8JmcrW-As" },
+          { id: "e4", name: "Squats", sets: 3, reps: "20", videoId: "gcNh17Ckjgg" },
+          { id: "e5", name: "Lunges", sets: 3, reps: "15/leg", videoId: "QOVaHwm-Q6U" },
+          { id: "e6", name: "Plank", sets: 3, reps: "60 sec", videoId: "pSHjTRCQxIw" }
         ],
         cooldown: { name: "Cool down", duration: "10 Min", videoUrl: "" }
       }

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, Button, StyleSheet, FlatList, Alert } from 'react-native';
+import { View, Text, Button, StyleSheet, FlatList, Alert, Modal, TouchableOpacity } from 'react-native';
 import Checkbox from 'expo-checkbox';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Ionicons } from '@expo/vector-icons'; // Built-in icons!
+import YoutubePlayer from 'react-native-youtube-iframe';
 import { workoutPlan } from '../data/workoutPlan';
 
 export default function WorkoutScreen({ navigation }) {
@@ -9,6 +11,9 @@ export default function WorkoutScreen({ navigation }) {
   const warmup = workoutPlan.month1.routine.warmup;
 
   const [checkedItems, setCheckedItems] = useState({});
+  // NEW: States for our video pop-up
+  const [modalVisible, setModalVisible] = useState(false);
+  const [currentVideoId, setCurrentVideoId] = useState(null);
 
   const toggleCheckbox = (id) => {
     setCheckedItems(prev => ({
@@ -56,6 +61,12 @@ export default function WorkoutScreen({ navigation }) {
         <Text style={styles.exerciseName}>{item.name}</Text>
         <Text style={styles.exerciseDetails}>{item.sets} sets x {item.reps}</Text>
       </View>
+      {/* NEW: Play Button for the video */}
+      {item.videoId && (
+        <TouchableOpacity onPress={() => openVideo(item.videoId)} style={styles.playButton}>
+          <Ionicons name="play-circle" size={32} color="#ff0000" />
+        </TouchableOpacity>
+      )}
     </View>
   );
 
@@ -79,6 +90,27 @@ export default function WorkoutScreen({ navigation }) {
           onPress={finishWorkout} 
         />
       </View>
+
+      {/* NEW: The Video Pop-up Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            {currentVideoId && (
+              <YoutubePlayer
+                height={220}
+                play={true}
+                videoId={currentVideoId}
+              />
+            )}
+            <Button title="Close Video" color="#333" onPress={() => setModalVisible(false)} />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -94,4 +126,7 @@ const styles = StyleSheet.create({
   exerciseName: { fontSize: 18, fontWeight: '500' },
   exerciseDetails: { fontSize: 14, color: '#555', marginTop: 4 },
   buttonContainer: { marginTop: 20, paddingBottom: 20 },
+  /* Modal Styles */
+  modalOverlay: { flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.8)' },
+  modalContent: { backgroundColor: '#fff', margin: 20, borderRadius: 10, overflow: 'hidden', paddingBottom: 10 }
 });

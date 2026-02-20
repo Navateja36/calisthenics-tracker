@@ -6,9 +6,15 @@ import { Ionicons } from '@expo/vector-icons';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import { workoutPlan } from '../data/workoutPlan';
 
-export default function WorkoutScreen({ navigation }) {
-  const exercises = workoutPlan.month1.routine.exercises;
-  const warmup = workoutPlan.month1.routine.warmup;
+export default function WorkoutScreen({ route, navigation }) {
+  const { monthId = 'month1', routineType } = route.params || {};
+  
+  const plan = workoutPlan[monthId];
+  const isSplit = plan.type === 'split';
+  
+  const exercises = isSplit ? plan.routines[routineType].exercises : plan.routine.exercises;
+  const warmup = isSplit ? plan.routines[routineType].warmup : plan.routine.warmup;
+  const screenTitle = isSplit ? `${plan.title} - ${plan.routines[routineType].name}` : plan.title;
 
   const [checkedItems, setCheckedItems] = useState({});
   const [modalVisible, setModalVisible] = useState(false);
@@ -24,14 +30,29 @@ export default function WorkoutScreen({ navigation }) {
   };
 
   const finishWorkout = async () => {
+    // 1. Count how many boxes are actually checked 'true'
+    const completedCount = Object.values(checkedItems).filter(value => value === true).length;
+    
+    // 2. Compare it to the total number of exercises for today
+    if (completedCount < exercises.length) {
+      // 3. If they don't match, yell at the user and STOP the function
+      Alert.alert(
+        "Hold up!", 
+        `You've only finished ${completedCount} out of ${exercises.length} exercises. Finish your sets bro!`
+      );
+      return; 
+    }
+    
     try {
       const today = new Date().toISOString().split('T')[0];
-      const existingData = await AsyncStorage.getItem('completedDates');
+      
+      const storageKey = `completedDates_${monthId}`;
+      const existingData = await AsyncStorage.getItem(storageKey);
       let datesArray = existingData ? JSON.parse(existingData) : [];
 
       if (!datesArray.includes(today)) {
         datesArray.push(today);
-        await AsyncStorage.setItem('completedDates', JSON.stringify(datesArray));
+        await AsyncStorage.setItem(storageKey, JSON.stringify(datesArray));
       }
 
       Alert.alert("Awesome!", "Workout saved successfully.", [
@@ -44,8 +65,6 @@ export default function WorkoutScreen({ navigation }) {
   };
 
   const renderExercise = ({ item }) => (
-    // FIX 1: We changed this main View into a TouchableOpacity
-    // Now tapping anywhere on the row triggers toggleCheckbox
     <TouchableOpacity 
       style={styles.exerciseRow} 
       onPress={() => toggleCheckbox(item.id)}
@@ -72,7 +91,7 @@ export default function WorkoutScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Month 1 Routine</Text>
+      <Text style={styles.title}>{screenTitle}</Text>
       <Text style={styles.warmup}>Warmup: {warmup.duration} - {warmup.notes}</Text>
 
       <FlatList
@@ -92,38 +111,29 @@ export default function WorkoutScreen({ navigation }) {
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        {/* FIX 2: Redesigned the modal to be a sleek Bottom Sheet */}
         <View style={styles.modalOverlay}>
           <View style={styles.bottomSheet}>
-            
             <View style={styles.sheetHeader}>
               <Text style={styles.sheetTitle}>Tutorial</Text>
               <TouchableOpacity onPress={() => setModalVisible(false)}>
                 <Ionicons name="close-circle" size={30} color="#d3d3d3" />
               </TouchableOpacity>
             </View>
-
             {currentVideoId && (
               <View style={styles.videoContainer}>
-                <YoutubePlayer
-                  height={220}
-                  play={true}
-                  videoId={currentVideoId}
-                />
+                <YoutubePlayer height={220} play={true} videoId={currentVideoId} />
               </View>
             )}
-
           </View>
         </View>
       </Modal>
-
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: '#fff' },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 10 },
+  title: { fontSize: 22, fontWeight: 'bold', marginBottom: 10 },
   warmup: { fontSize: 14, color: '#666', marginBottom: 20, fontStyle: 'italic' },
   list: { flex: 1 },
   exerciseRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 15, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#eee' },
@@ -133,38 +143,9 @@ const styles = StyleSheet.create({
   exerciseDetails: { fontSize: 14, color: '#555', marginTop: 4 },
   playButton: { padding: 5 },
   buttonContainer: { marginTop: 20, paddingBottom: 20 },
-  
-  /* NEW: Bottom Sheet Modal Styles */
-  modalOverlay: { 
-    flex: 1, 
-    justifyContent: 'flex-end', /* Pushes the box to the very bottom */
-    backgroundColor: 'rgba(0,0,0,0.6)' /* Darkens the background behind it */
-  },
-  bottomSheet: { 
-    backgroundColor: '#fff', 
-    borderTopLeftRadius: 25, 
-    borderTopRightRadius: 25, 
-    padding: 20, 
-    paddingBottom: 40,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 5
-  },
-  sheetHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 15
-  },
-  sheetTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333'
-  },
-  videoContainer: {
-    borderRadius: 10,
-    overflow: 'hidden'
-  }
+  modalOverlay: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.6)' },
+  bottomSheet: { backgroundColor: '#fff', borderTopLeftRadius: 25, borderTopRightRadius: 25, padding: 20, paddingBottom: 40, shadowColor: '#000', shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.25, shadowRadius: 10, elevation: 5 },
+  sheetHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 },
+  sheetTitle: { fontSize: 20, fontWeight: 'bold', color: '#333' },
+  videoContainer: { borderRadius: 10, overflow: 'hidden' }
 });

@@ -11,11 +11,22 @@ export default function DashboardScreen({ navigation }) {
   
   const currentPlan = workoutPlan[selectedMonth];
 
+  // NEW: The Safety Net! If data is missing, stop here and don't crash.
+  if (!currentPlan) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading data or data not found for {selectedMonth}...</Text>
+      </View>
+    );
+  }
+
   useFocusEffect(
     useCallback(() => {
       const fetchProgress = async () => {
         try {
-          const existingData = await AsyncStorage.getItem('completedDates');
+          const storageKey = `completedDates_${selectedMonth}`;
+          const existingData = await AsyncStorage.getItem(storageKey);
+          
           const datesArray = existingData ? JSON.parse(existingData) : [];
           
           const completedCount = datesArray.length;

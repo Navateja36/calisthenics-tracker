@@ -11,11 +11,10 @@ export default function DashboardScreen({ navigation }) {
   
   const currentPlan = workoutPlan[selectedMonth];
 
-  // NEW: The Safety Net! If data is missing, stop here and don't crash.
   if (!currentPlan) {
     return (
       <View style={styles.container}>
-        <Text>Loading data or data not found for {selectedMonth}...</Text>
+        <Text>Loading data...</Text>
       </View>
     );
   }
@@ -26,7 +25,6 @@ export default function DashboardScreen({ navigation }) {
         try {
           const storageKey = `completedDates_${selectedMonth}`;
           const existingData = await AsyncStorage.getItem(storageKey);
-          
           const datesArray = existingData ? JSON.parse(existingData) : [];
           
           const completedCount = datesArray.length;
@@ -48,19 +46,16 @@ export default function DashboardScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* Month Selector Tabs */}
+      {/* Centered, sleek tabs */}
       <View style={styles.tabContainer}>
-        <TouchableOpacity 
-          style={[styles.tab, selectedMonth === 'month1' && styles.activeTab]}
-          onPress={() => setSelectedMonth('month1')}
-        >
-          <Text style={[styles.tabText, selectedMonth === 'month1' && styles.activeTabText]}>Month 1</Text>
+        <TouchableOpacity style={[styles.tab, selectedMonth === 'month1' && styles.activeTab]} onPress={() => setSelectedMonth('month1')}>
+          <Text style={[styles.tabText, selectedMonth === 'month1' && styles.activeTabText]}>M1</Text>
         </TouchableOpacity>
-        <TouchableOpacity 
-          style={[styles.tab, selectedMonth === 'month2' && styles.activeTab]}
-          onPress={() => setSelectedMonth('month2')}
-        >
-          <Text style={[styles.tabText, selectedMonth === 'month2' && styles.activeTabText]}>Month 2</Text>
+        <TouchableOpacity style={[styles.tab, selectedMonth === 'month2' && styles.activeTab]} onPress={() => setSelectedMonth('month2')}>
+          <Text style={[styles.tabText, selectedMonth === 'month2' && styles.activeTabText]}>M2</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.tab, selectedMonth === 'month3' && styles.activeTab]} onPress={() => setSelectedMonth('month3')}>
+          <Text style={[styles.tabText, selectedMonth === 'month3' && styles.activeTabText]}>M3</Text>
         </TouchableOpacity>
       </View>
 
@@ -76,38 +71,32 @@ export default function DashboardScreen({ navigation }) {
         </View>
       </View>
       
+      {/* Neatly stacked buttons */}
       <View style={styles.buttonContainer}>
         {currentPlan.type === 'full_body' ? (
-          <Button 
-            title="START FULL BODY WORKOUT" 
-            color="#4630EB"
-            onPress={() => navigation.navigate('Workout', { monthId: selectedMonth })} 
-          />
+          <View style={styles.splitBtnWrapper}>
+            <Button 
+              title="START FULL BODY WORKOUT" 
+              color="#4630EB"
+              onPress={() => navigation.navigate('Workout', { monthId: selectedMonth })} 
+            />
+          </View>
         ) : (
           <View style={styles.splitButtons}>
-            <View style={styles.splitBtnWrapper}>
-              <Button 
-                title="START UPPER BODY" 
-                color="#e53935"
-                onPress={() => navigation.navigate('Workout', { monthId: selectedMonth, routineType: 'upper' })} 
-              />
-            </View>
-            <View style={styles.splitBtnWrapper}>
-              <Button 
-                title="START LOWER BODY" 
-                color="#1e88e5"
-                onPress={() => navigation.navigate('Workout', { monthId: selectedMonth, routineType: 'lower' })} 
-              />
-            </View>
+            {Object.keys(currentPlan.routines).map((routineKey) => (
+              <View key={routineKey} style={styles.splitBtnWrapper}>
+                <Button 
+                  title={`START ${currentPlan.routines[routineKey].name.toUpperCase()}`} 
+                  color={routineKey === 'push' ? '#e53935' : routineKey === 'pull' ? '#1e88e5' : '#43a047'}
+                  onPress={() => navigation.navigate('Workout', { monthId: selectedMonth, routineType: routineKey })} 
+                />
+              </View>
+            ))}
           </View>
         )}
         
-        <View style={{ marginTop: 20 }}>
-          <Button 
-            title="VIEW CALENDAR HISTORY" 
-            color="#555"
-            onPress={() => navigation.navigate('History')} 
-          />
+        <View style={styles.historyWrapper}>
+          <Button title="VIEW CALENDAR HISTORY" color="#555" onPress={() => navigation.navigate('History')} />
         </View>
       </View>
     </View>
@@ -115,19 +104,55 @@ export default function DashboardScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', padding: 20, backgroundColor: '#f9f9f9', paddingTop: 40 },
-  tabContainer: { flexDirection: 'row', marginBottom: 30, backgroundColor: '#eee', borderRadius: 10, padding: 5 },
-  tab: { paddingVertical: 10, paddingHorizontal: 30, borderRadius: 8 },
-  activeTab: { backgroundColor: '#fff', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
-  tabText: { fontSize: 16, color: '#666', fontWeight: 'bold' },
-  activeTabText: { color: '#4630EB' },
+  container: { flex: 1, alignItems: 'center', padding: 20, backgroundColor: '#f9f9f9', paddingTop: 50 },
+  
+  /* Tabs */
+  /* Tabs */
+  tabContainer: { 
+    flexDirection: 'row', 
+    backgroundColor: '#e0e0e0', 
+    borderRadius: 10, 
+    padding: 4, 
+    width: '100%', 
+    marginBottom: 30 
+  },
+  tab: { 
+    flex: 1, // This is the magic command that forces all 3 to be exactly equal width
+    paddingVertical: 10, 
+    alignItems: 'center', 
+    justifyContent: 'center',
+    borderRadius: 8,
+    marginHorizontal: 2 // Adds a tiny gap between the buttons so they don't touch
+  },
+  activeTab: { 
+    backgroundColor: '#fff', 
+    shadowColor: '#000', 
+    shadowOpacity: 0.1, 
+    shadowRadius: 4, 
+    elevation: 2 
+  },
+  tabText: { 
+    fontSize: 16, 
+    color: '#666', 
+    fontWeight: 'bold' 
+  },
+  activeTabText: { 
+    color: '#4630EB' 
+  },
+  
+  /* Text */
   title: { fontSize: 26, fontWeight: 'bold', textAlign: 'center' },
-  subtitle: { fontSize: 16, color: 'gray', marginBottom: 40 },
+  subtitle: { fontSize: 16, color: 'gray', marginBottom: 30 },
+  
+  /* Progress Bar */
   progressContainer: { width: '100%', marginBottom: 40 },
   progressText: { fontSize: 16, marginBottom: 10, textAlign: 'center', fontWeight: '600' },
   progressBarBackground: { height: 20, backgroundColor: '#e0e0e0', borderRadius: 10, overflow: 'hidden' },
   progressBarFill: { height: '100%', backgroundColor: '#4caf50' },
-  buttonContainer: { width: '90%' },
-  splitButtons: { flexDirection: 'row', justifyContent: 'space-between' },
-  splitBtnWrapper: { flex: 1, marginHorizontal: 5 }
+  
+  /* Buttons */
+  buttonContainer: { width: '100%' },
+  splitButtons: { width: '100%' },
+  splitBtnWrapper: { marginBottom: 15, width: '100%' },
+  historyWrapper: { marginTop: 15, width: '100%' }
 });

@@ -1,5 +1,3 @@
-// src/data/workoutPlan.js
-
 export const workoutPlan = {
   month1: {
     id: "m1",
@@ -22,13 +20,12 @@ export const workoutPlan = {
     }
   },
   
-  // NEW: Month 2 Data added here
   month2: {
     id: "m2",
     title: "Increasing Intensity & Skill",
     weeks: "Week 5-8",
     daysInBlock: 28,
-    minimumTargetSessions: 16, // 4 times a week * 4 weeks
+    minimumTargetSessions: 16,
     type: "split",
     routines: {
       upper: {
@@ -56,9 +53,51 @@ export const workoutPlan = {
         ],
         cooldown: { duration: "10 Min" }
       }
-    },
-    skillTraining: {
-      notes: "Skill Training: 2-3 times/week after main workout."
+    }
+  },
+
+  // NEW: Month 3 Push/Pull/Legs Split
+  month3: {
+    id: "m3",
+    title: "Mastery & Hypertrophy",
+    weeks: "Week 9-12",
+    daysInBlock: 28,
+    minimumTargetSessions: 20, // 5 days a week target
+    type: "split",
+    routines: {
+      push: {
+        name: "Advanced Push",
+        warmup: { duration: "10 Min", notes: "Wrist & Shoulder Mobility" },
+        exercises: [
+          { id: "m3p1", name: "Wall Handstand Pushups", sets: 4, reps: "6-8", videoId: "hwkiJntX8Zg" },
+          { id: "m3p2", name: "Advanced Dips", sets: 4, reps: "12-15", videoId: "2z8JmcrW-As" },
+          { id: "m3p3", name: "Pseudo Planche Pushups", sets: 3, reps: "10", videoId: "7xXW8J6C3e0" },
+          { id: "m3p4", name: "Triceps Extensions (Bodyweight)", sets: 3, reps: "12", videoId: "gTQXB2D3H1o" }
+        ],
+        cooldown: { duration: "10 Min" }
+      },
+      pull: {
+        name: "Advanced Pull",
+        warmup: { duration: "10 Min", notes: "Scapula pull-ups & hangs" },
+        exercises: [
+          { id: "m3pl1", name: "Archer Pull-ups", sets: 4, reps: "6/side", videoId: "X_lE4r-JbZc" },
+          { id: "m3pl2", name: "Muscle-up Negatives", sets: 4, reps: "5", videoId: "X-QxU-HnmbI" },
+          { id: "m3pl3", name: "Front Lever Tucks", sets: 3, reps: "15 sec hold", videoId: "vA_IqZ7F0_c" },
+          { id: "m3pl4", name: "Chin-ups", sets: 3, reps: "Max", videoId: "eGo4IYtlpEM" }
+        ],
+        cooldown: { duration: "10 Min" }
+      },
+      legs: {
+        name: "Legs & Core",
+        warmup: { duration: "10 Min", notes: "Dynamic stretches & deep squats" },
+        exercises: [
+          { id: "m3l1", name: "Pistol Squats", sets: 4, reps: "8/leg", videoId: "vq5-cdjihcg" },
+          { id: "m3l2", name: "Shrimp Squats", sets: 3, reps: "8/leg", videoId: "gcNh17Ckjgg" },
+          { id: "m3l3", name: "Dragon Flags", sets: 4, reps: "8", videoId: "wkD8rjkodUI" },
+          { id: "m3l4", name: "L-Sit Hold", sets: 4, reps: "15 sec", videoId: "Pr1ieGZ5atk" }
+        ],
+        cooldown: { duration: "10 Min" }
+      }
     }
   }
 };

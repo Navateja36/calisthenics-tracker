@@ -53,7 +53,8 @@ export default function WorkoutScreen({ route, navigation }) {
       }
 
       Alert.alert("Awesome!", "Workout saved successfully. Great job today!", [
-        { text: "OK", onPress: () => navigation.navigate('Dashboard') }
+        // FIX: We use goBack() to pop s2 off the stack and reveal the original s1!
+        { text: "OK", onPress: () => navigation.goBack() } 
       ]);
     } catch (error) {
       console.error("Error saving workout:", error);

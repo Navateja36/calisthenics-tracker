@@ -139,10 +139,37 @@ export default function DashboardScreen({ navigation }) {
       </View>
 
       <TouchableOpacity style={styles.floatingResetButton} onPress={() => setResetModalVisible(true)}>
-        <Ionicons name="trash-outline" size={24} color="#fff" />
+        <Ionicons size={24} color="#fff" />
       </TouchableOpacity>
 
       {/* Reset Modal code remains same... */}
+      <Modal animationType="fade" transparent={true} visible={resetModalVisible} onRequestClose={() => setResetModalVisible(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Are you absolutely sure?</Text>
+            <Text style={styles.modalText}>This will permanently delete all your completed workouts for Month 1, 2, and 3. You cannot undo this.</Text>
+            <Text style={styles.modalInstructions}>Type the word <Text style={{fontWeight: 'bold', color: 'red'}}>reset</Text> to confirm:</Text>
+            
+            <TextInput
+              style={styles.input}
+              onChangeText={setResetInput}
+              value={resetInput}
+              placeholder="Type reset here..."
+              placeholderTextColor="#999"
+              autoCapitalize="none"
+            />
+            
+            <View style={styles.modalButtons}>
+              <TouchableOpacity style={[styles.customButton, { backgroundColor: '#555', flex: 1, marginRight: 10 }]} onPress={() => { setResetModalVisible(false); setResetInput(''); }}>
+                <Text style={styles.customButtonText}>CANCEL</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.customButton, { backgroundColor: 'red', flex: 1, marginLeft: 10 }]} onPress={executeReset}>
+                <Text style={styles.customButtonText}>WIPE DATA</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -167,5 +194,5 @@ const styles = StyleSheet.create({
   customButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
   historyButton: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#ddd' },
   historyButtonText: { color: '#333', fontSize: 15, fontWeight: 'bold' },
-  floatingResetButton: { position: 'absolute', bottom: 30, left: 20, width: 50, height: 50, borderRadius: 25, backgroundColor: '#c62828', justifyContent: 'center', alignItems: 'center', elevation: 5 }
+  floatingResetButton: { position: 'absolute', bottom: 30, left: 20, width: 20, height: 20, borderRadius: 25, backgroundColor: '#c62828', justifyContent: 'center', alignItems: 'center', elevation: 5 }
 });

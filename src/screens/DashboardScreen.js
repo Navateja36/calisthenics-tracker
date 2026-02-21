@@ -79,6 +79,29 @@ export default function DashboardScreen({ navigation }) {
       Alert.alert("Locked!", `Finish all target sessions in ${prevMonth} to unlock this stage!`);
     }
   };
+  const executeReset = async () => {
+    if (resetInput === 'RESET') {
+      try {
+        const storageKey = `completedDates_${selectedMonth}`;
+        await AsyncStorage.removeItem(storageKey);
+        
+        // Reset the local state so the UI updates instantly
+        setWorkoutsCompleted(0);
+        setProgress(0);
+        setResetModalVisible(false);
+        setResetInput('');
+        
+        // Re-check the locks in case they reset Month 1!
+        checkUnlocks(); 
+        
+        Alert.alert("Reset Successful", `${selectedMonth.toUpperCase()} progress has been wiped.`);
+      } catch (error) {
+        console.error("Failed to reset", error);
+      }
+    } else {
+      Alert.alert("Action Required", "Please type exactly 'RESET' to confirm.");
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -142,29 +165,31 @@ export default function DashboardScreen({ navigation }) {
         <Ionicons size={24} color="#fff" />
       </TouchableOpacity>
 
-      {/* Reset Modal code remains same... */}
-      <Modal animationType="fade" transparent={true} visible={resetModalVisible} onRequestClose={() => setResetModalVisible(false)}>
+      {/* The Reset Modal */}
+      <Modal visible={resetModalVisible} transparent={true} animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Are you absolutely sure?</Text>
-            <Text style={styles.modalText}>This will permanently delete all your completed workouts for Month 1, 2, and 3. You cannot undo this.</Text>
-            <Text style={styles.modalInstructions}>Type the word <Text style={{fontWeight: 'bold', color: 'red'}}>reset</Text> to confirm:</Text>
+            <Text style={styles.modalTitle}>Reset Progress?</Text>
+            <Text style={styles.modalText}>Type "RESET" to wipe your {selectedMonth} history. This cannot be undone.</Text>
             
-            <TextInput
-              style={styles.input}
-              onChangeText={setResetInput}
-              value={resetInput}
-              placeholder="Type reset here..."
-              placeholderTextColor="#999"
-              autoCapitalize="none"
+            <TextInput 
+              style={styles.modalInput} 
+              placeholder="Type RESET here" 
+              value={resetInput} 
+              onChangeText={setResetInput} 
+              autoCapitalize="characters"
             />
             
             <View style={styles.modalButtons}>
-              <TouchableOpacity style={[styles.customButton, { backgroundColor: '#555', flex: 1, marginRight: 10 }]} onPress={() => { setResetModalVisible(false); setResetInput(''); }}>
-                <Text style={styles.customButtonText}>CANCEL</Text>
+              <TouchableOpacity 
+                style={styles.cancelButton} 
+                onPress={() => { setResetModalVisible(false); setResetInput(''); }}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.customButton, { backgroundColor: 'red', flex: 1, marginLeft: 10 }]} onPress={executeReset}>
-                <Text style={styles.customButtonText}>WIPE DATA</Text>
+              
+              <TouchableOpacity style={styles.confirmResetButton} onPress={executeReset}>
+                <Text style={styles.confirmResetButtonText}>Delete</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -194,5 +219,16 @@ const styles = StyleSheet.create({
   customButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
   historyButton: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#ddd' },
   historyButtonText: { color: '#333', fontSize: 15, fontWeight: 'bold' },
-  floatingResetButton: { position: 'absolute', bottom: 30, left: 20, width: 20, height: 20, borderRadius: 25, backgroundColor: '#c62828', justifyContent: 'center', alignItems: 'center', elevation: 5 }
+  floatingResetButton: { position: 'absolute', bottom: 30, left: 20, width: 20, height: 20, borderRadius: 25, backgroundColor: '#c62828', justifyContent: 'center', alignItems: 'center', elevation: 5 },
+
+  modalOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.6)' },
+  modalContent: { width: '85%', backgroundColor: '#fff', borderRadius: 20, padding: 25, alignItems: 'center', elevation: 10 },
+  modalTitle: { fontSize: 22, fontWeight: '900', color: '#c62828', marginBottom: 10 },
+  modalText: { fontSize: 16, textAlign: 'center', marginBottom: 20, color: '#444' },
+  modalInput: { width: '100%', borderWidth: 2, borderColor: '#eee', borderRadius: 10, padding: 15, fontSize: 16, marginBottom: 20, textAlign: 'center', fontWeight: 'bold' },
+  modalButtons: { flexDirection: 'row', justifyContent: 'space-between', width: '100%' },
+  cancelButton: { flex: 1, padding: 15, alignItems: 'center', backgroundColor: '#eee', borderRadius: 10, marginRight: 10 },
+  cancelButtonText: { fontSize: 16, fontWeight: 'bold', color: '#333' },
+  confirmResetButton: { flex: 1, padding: 15, alignItems: 'center', backgroundColor: '#c62828', borderRadius: 10, marginLeft: 10 },
+  confirmResetButtonText: { fontSize: 16, fontWeight: 'bold', color: '#fff' }
 });
